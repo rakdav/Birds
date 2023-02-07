@@ -16,10 +16,12 @@ public class GameView extends View
     private int viewHeight;
     private int points=0;
     private Sprite playerBird;
+    private Sprite enemyBird;
     private final int timerInterval = 30;
 
     public GameView(Context context) {
         super(context);
+
         Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.pic_birds);
         int w = b.getWidth()/5;
         int h = b.getHeight()/3;
@@ -36,12 +38,34 @@ public class GameView extends View
                 playerBird.addFrame(new Rect(j * w, i * h, j * w + w, i * w + w));
             }
         }
+
+        b = BitmapFactory.decodeResource(getResources(), R.drawable.enemy);
+        w = b.getWidth()/5;
+        h = b.getHeight()/3;
+
+        firstFrame = new Rect(4*w, 0, 5*w, h);
+
+        enemyBird = new Sprite(2000, 250, -300, 0, firstFrame, b);
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 4; j >= 0; j--) {
+                if (i ==0 && j == 4) {
+                    continue;
+                }
+                if (i ==2 && j == 0) {
+                    continue;
+                }
+                enemyBird.addFrame(new Rect(j*w, i*h, j*w+w, i*w+w));
+            }
+        }
+
         Timer t = new Timer();
         t.start();
     }
 
     protected void update () {
         playerBird.update(timerInterval);
+        enemyBird.update(timerInterval);
         invalidate();
     }
 
@@ -50,6 +74,7 @@ public class GameView extends View
         super.onDraw(canvas);
         canvas.drawARGB(250,127,199,255);
         playerBird.draw(canvas);
+        enemyBird.draw(canvas);
         Paint p=new Paint();
         p.setAntiAlias(true);
         p.setTextSize(55.0f);
