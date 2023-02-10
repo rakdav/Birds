@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.CountDownTimer;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class GameView extends View
@@ -66,6 +67,14 @@ public class GameView extends View
     protected void update () {
         playerBird.update(timerInterval);
         enemyBird.update(timerInterval);
+        if (enemyBird.getX() < - enemyBird.getFrameWidth()) {
+            teleportEnemy ();
+            points +=10;
+        }
+        if (enemyBird.intersect(playerBird)) {
+            teleportEnemy ();
+            points -= 40;
+        }
         invalidate();
     }
 
@@ -87,6 +96,30 @@ public class GameView extends View
         super.onSizeChanged(w, h, oldw, oldh);
         viewHeight=h;
         viewWidth=w;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int eventAction=event.getAction();
+        if(eventAction==MotionEvent.ACTION_DOWN)
+        {
+            if(event.getY()<playerBird.getBoundingBoxRect().top)
+            {
+                playerBird.setVelocityY(-100);
+                points--;
+            }
+            else if(event.getY()>playerBird.getBoundingBoxRect().bottom)
+            {
+                playerBird.setVelocityY(100);
+                points--;
+            }
+        }
+        return true;
+    }
+    private void teleportEnemy () {
+        enemyBird.setX(viewWidth + Math.random() * 500);
+        enemyBird.setY(Math.random() *
+                (viewHeight - enemyBird.getFrameHeight()));
     }
 
     class Timer extends CountDownTimer {
